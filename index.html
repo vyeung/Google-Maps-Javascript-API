@@ -11,7 +11,15 @@
 </head>
 
 <body>
-  <h1>My Google Map</h1>
+  <h1>Search For Nearby Places</h1>
+
+  <div class="Form">
+    <form onsubmit=performSearch(event)>
+      <input type="text" name="query" placeholder="Search Map..">
+      <button class="button">Go</button>
+    </form>
+  </div>
+
   <div id="map"></div>
 
   <script>
@@ -21,19 +29,25 @@
 
     //callback function
     function handleSearchResults(results, status) {
-      // if (status == google.maps.places.PlacesServiceStatus.OK) {
-      //   for (var i = 0; i < results.length; i++) {
-      //     var place = results[i];
-      //     createMarker(results[i]);
-      //   }
-      // }
+      var marker;
+
       console.log(results);
+      if(status == google.maps.places.PlacesServiceStatus.OK) {
+        for(var i=0; i<results.length; i++) {
+          marker = new google.maps.Marker({
+            position: results[i].geometry.location,
+            map: myMap
+          });
+        }
+      }
     }
 
-    function performSearch() {
+    function performSearch(event) {
+      event.preventDefault();
+    
       var request = {
         bounds: myMap.getBounds(),
-        name: "mcdonald's"
+        name: event.target.elements.query.value
       };
       service.nearbySearch(request, handleSearchResults);
     }
@@ -67,7 +81,7 @@
       service = new google.maps.places.PlacesService(myMap);
 
       //wait until map bounds are intialized before doing search
-      google.maps.event.addListenerOnce(myMap, "bounds_changed", performSearch);
+      //google.maps.event.addListenerOnce(myMap, "bounds_changed", performSearch);
     }
 
   </script>
