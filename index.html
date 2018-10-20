@@ -17,46 +17,62 @@
   <script>
     var myMap;
     var mapOptions;
-    
-    //get current user location
-    navigator.geolocation.getCurrentPosition(initMap);
+    var service;
+
+    //callback function
+    function handleSearchResults(results, status) {
+      // if (status == google.maps.places.PlacesServiceStatus.OK) {
+      //   for (var i = 0; i < results.length; i++) {
+      //     var place = results[i];
+      //     createMarker(results[i]);
+      //   }
+      // }
+      console.log(results);
+    }
+
+    function performSearch() {
+      var request = {
+        bounds: myMap.getBounds(),
+        name: "mcdonald's"
+      };
+      service.nearbySearch(request, handleSearchResults);
+    }
+
+    function getUserLocation() {
+      navigator.geolocation.getCurrentPosition(initMap);
+    }
 
     function initMap(userLocation) {
       var latVal;
       var lngVal;
       var homeMarker;
-      var userCoords;
-
-      //userLocation may not be immediately available due to async API call
-      if(!userLocation) {
-        latVal = 0;
-        lngVal = 0;
-      }
-      else {
-        latVal = userLocation.coords.latitude;
-        lngVal = userLocation.coords.longitude;
-      }
-
-      userCoords = {lat: latVal, lng: lngVal};
+      
+      console.log(userLocation);
+      latVal = userLocation.coords.latitude;
+      lngVal = userLocation.coords.longitude;
 
       mapOptions = {
-        center: userCoords,
+        center: {lat: latVal, lng: lngVal},
         zoom: 13
       };
 
       myMap = new google.maps.Map(document.getElementById("map"), mapOptions);
 
       homeMarker = new google.maps.Marker({
-        position: userCoords,
+        position: {lat: latVal, lng: lngVal},
         map: myMap,
         icon: "images/home.png"
       });
+
+      service = new google.maps.places.PlacesService(myMap);
+
+      //wait until map bounds are intialized before doing search
+      google.maps.event.addListenerOnce(myMap, "bounds_changed", performSearch);
     }
+
   </script>
 
-  <script async defer 
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByh22bEaSxERnmiyTxh6iYqthkspDjvCU&callback=initMap">
-  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByh22bEaSxERnmiyTxh6iYqthkspDjvCU&callback=getUserLocation&libraries=places"></script>
 </body>
 
 </html>
