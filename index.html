@@ -26,18 +26,27 @@
     var myMap;
     var mapOptions;
     var service;
+    var myMarkers = [];
 
     //callback function
     function handleSearchResults(results, status) {
       var marker;
-
       console.log(results);
+
+      //remove old markers from previous search
+      for(var i=0; i<myMarkers.length; i++) {
+        myMarkers[i].setMap(null);
+      }
+      myMarkers = [];
+
+      //new markers
       if(status == google.maps.places.PlacesServiceStatus.OK) {
         for(var i=0; i<results.length; i++) {
           marker = new google.maps.Marker({
             position: results[i].geometry.location,
             map: myMap
           });
+          myMarkers.push(marker);
         }
       }
     }
