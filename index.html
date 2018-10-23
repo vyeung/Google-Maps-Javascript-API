@@ -11,12 +11,10 @@
 </head>
 
 <body>
-  <h1>Search For Nearby Places</h1>
-
-  <div class="Form">
+  <div class="SearchBar">
     <form onsubmit=performSearch(event)>
       <input type="text" name="query" placeholder="Search Map..">
-      <button class="button">Go</button>
+      <button>Go</button>
     </form>
   </div>
 
@@ -88,9 +86,6 @@
       });
 
       service = new google.maps.places.PlacesService(myMap);
-
-      //wait until map bounds are intialized before doing search
-      //google.maps.event.addListenerOnce(myMap, "bounds_changed", performSearch);
     }
 
   </script>
