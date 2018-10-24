@@ -28,7 +28,6 @@
 
     //callback function
     function handleSearchResults(results, status) {
-      var marker;
       console.log(results);
 
       //remove old markers from previous search
@@ -39,19 +38,42 @@
 
       //new markers
       if(status == google.maps.places.PlacesServiceStatus.OK) {
+        //infoWindow declaration needs to be outside of loop
+        var infoWindow = new google.maps.InfoWindow();
+        
         for(var i=0; i<results.length; i++) {
-          marker = new google.maps.Marker({
+          var openCheck = "";
+          if(results[i].opening_hours && results[i].opening_hours.open_now == true)
+            openCheck = "Store Open"
+          if(results[i].opening_hours && results[i].opening_hours.open_now == false)
+            openCheck = "Store Closed"
+
+          //using a template string
+          var contentString = `
+            <p class="placeName">${results[i].name}</p>
+            <p>${results[i].vicinity}</p>
+            <p>Rating: ${results[i].rating}/5</p>
+            <p>${openCheck}</p>
+          `;
+
+          var marker = new google.maps.Marker({
             position: results[i].geometry.location,
-            map: myMap
+            map: myMap,
+            content: contentString
           });
           myMarkers.push(marker);
+
+          //replacing "marker" with "this" works
+          marker.addListener("click", function() {
+            infoWindow.setContent(this.content);
+            infoWindow.open(myMap, this);
+          });
         }
       }
     }
 
     function performSearch(event) {
       event.preventDefault();
-    
       var request = {
         bounds: myMap.getBounds(),
         name: event.target.elements.query.value
@@ -87,7 +109,6 @@
 
       service = new google.maps.places.PlacesService(myMap);
     }
-
   </script>
 
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByh22bEaSxERnmiyTxh6iYqthkspDjvCU&callback=getUserLocation&libraries=places"></script>
